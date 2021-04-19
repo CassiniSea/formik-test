@@ -1,29 +1,6 @@
 import styles from '../styles/Home.module.css'
 import {useFormik} from "formik";
-
-// A custom validation function. This must return an object
-// which keys are symmetrical to our values/initialValues
-const validate = values => {
-  const errors = {};
-  if (!values.name) {
-    errors.name = 'Required';
-  } else if (values.name.length > 15) {
-    errors.name = 'Must be 15 characters or less';
-  }
-  if (!values.email) {
-    errors.email = 'Required';
-  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-    errors.email = 'Invalid email address';
-  }
-  if (!values.password) {
-    errors.password = 'Required';
-  } else if (values.password.length < 6) {
-    errors.password = 'Must be 6 characters or less'
-  } else if (values.password !== values.password_confirmation) {
-    errors.password = 'Confirm not match';
-  }
-  return errors;
-};
+import * as Yup from 'yup';
 
 const RegisterForm = () => {
   const formik = useFormik({
@@ -33,7 +10,18 @@ const RegisterForm = () => {
       password: '',
       password_confirmation: ''
     },
-    validate,
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .max(15, 'Must be 15 characters or less')
+        .required('Required'),
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Required'),
+      password: Yup.string()
+        .required('Required'),
+      password_confirmation: Yup.string()
+        .required('Required')
+    }),
     onSubmit: values => {
       console.log(values)
     }
@@ -44,45 +32,34 @@ const RegisterForm = () => {
         <label htmlFor="name">Title</label>
         <input
           id="name"
-          name="name"
           type="text"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.name}
+          {...formik.getFieldProps('name')}
         />
         {formik.touched.name && formik.errors.name ?
           <div>{formik.errors.name}</div> : null}
         <label htmlFor="email">Email</label>
         <input
           id="email"
-          name="email"
           type="email"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.email}
-        />
+          {...formik.getFieldProps('email')}        />
         {formik.touched.email && formik.errors.email ?
           <div>{formik.errors.email}</div> : null}
         <label htmlFor="password">Password</label>
         <input
           id="password"
-          name="password"
           type="password"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.password}
+          {...formik.getFieldProps('password')}
         />
         {formik.touched.password && formik.errors.password ?
           <div>{formik.errors.password}</div> : null}
         <label htmlFor="password_confirmation">Password confirm</label>
         <input
           id="password_confirmation"
-          name="password_confirmation"
           type="password"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.password_confirmation}
+          {...formik.getFieldProps('password_confirmation')}
         />
+        {formik.touched.password_confirmation && formik.errors.password_confirmation ?
+          <div>{formik.errors.password_confirmation}</div> : null}
         <button type="submit">Submit</button>
       </form>
     </div>
